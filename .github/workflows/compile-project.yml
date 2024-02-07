@@ -16,7 +16,7 @@ jobs:
         with:
           java-version: '17'
           java-package: 'jre'
-          distribution: 'oracle'
+          distribution: 'temurin'
       - name: fix permissions
         run: chmod +x mvnw
       - name: Build with Maven
