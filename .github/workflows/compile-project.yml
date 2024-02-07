@@ -20,4 +20,4 @@ jobs:
       - name: fix permissions
         run: chmod +x mvnw
       - name: Build with Maven
-        run: ./mvnw clean compile
+        run: ./mvnw clean install -X
