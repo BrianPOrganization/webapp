@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
@@ -26,7 +25,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User createUser(User user) throws NoSuchFieldException {
+    public User createUser(User user) {
         if(findByUsername(user.getUsername()) != null) {
             throw new BadRequestException("Username already exists");
         }

@@ -25,7 +25,7 @@ public class UserRestController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody User payload) throws NoSuchFieldException {
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody User payload) {
         User user = userService.createUser(payload);
         UserResponseDTO userResponseDTO = new UserResponseDTO(user);
         return ResponseEntity.ok().headers(httpHeaders).body(userResponseDTO);
