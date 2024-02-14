@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?createDatabaseIfNotExist=true
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database: mysql
+    show-sql: true
+logging:
+    level:
+        org:
+          springframework:
+            boot:
+              test:
+                context:
+                  springBootTestContextBootstrapper: WARN
+            context:
+              support:
+                AbstractContextLoader: WARN
+                AnnotationConfigContextLoaderUtils: WARN

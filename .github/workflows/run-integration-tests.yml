@@ -1,0 +1,38 @@
+name: Run Integration Tests
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  run-integration-tests:
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: debug mysql
+        run: mysql --host=127.0.0.1 --port=3306 --user=${{ env.MYSQL_USER }} --password=${{ env.MYSQL_ROOT_PASSWORD }} --execute="show databases;"
+      - name: fix permissions
+        run: chmod +x mvnw
+      - name: Run Tests with Maven
+        run: ./mvnw test
