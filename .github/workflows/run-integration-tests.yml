@@ -13,6 +13,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: password
+          MYSQL_ROOT_HOST: '127.0.0.1'
         ports:
           - 3306:3306
     steps:
