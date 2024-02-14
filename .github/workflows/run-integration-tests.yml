@@ -9,7 +9,7 @@ jobs:
   run-integration-tests:
     runs-on: ubuntu-latest
     env:
-      MYSQL_USER: root
+      MYSQL_USER: user
       MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_ROOT_PASSWORD }}
     services:
       mysql:
