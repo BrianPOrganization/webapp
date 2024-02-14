@@ -8,13 +8,16 @@ on:
 jobs:
   run-integration-tests:
     runs-on: ubuntu-latest
+    env:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_ROOT_PASSWORD }}
     services:
       mysql:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: ${{ vars.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: test_db
-          MYSQL_USER: user
+          MYSQL_USER: root
           MYSQL_PASSWORD: ${{ vars.MYSQL_ROOT_PASSWORD }}
         ports:
           - 3306:3306
