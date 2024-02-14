@@ -15,7 +15,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: test_db
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -28,7 +28,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: debug mysql
-        run: mysql --host 127.0.0.1 --port 3306 --user=root --password=password --execute="show databases;"
+        run: mysql --host 127.0.0.1 --port 3306 --user=${{ secrets.MYSQL_USER }} --password=${{ secrets.MYSQL_ROOT_PASSWORD }} --execute="show databases;"
       - name: fix permissions
         run: chmod +x mvnw
       - name: Run Tests with Maven
