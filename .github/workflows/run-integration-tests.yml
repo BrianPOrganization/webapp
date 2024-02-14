@@ -12,8 +12,8 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_USER: root
+          MYSQL_ROOT_PASSWORD: password
         ports:
           - 3306:3306
     steps:
@@ -24,6 +24,8 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      - name: debug mysql
+        run: mysql --host 127.0.0.1 --port 3306 --user=root --password=password --execute="show databases;"
       - name: run Mysql
         run: sudo systemctl start mysql
       - name: fix permissions
