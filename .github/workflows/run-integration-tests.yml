@@ -25,7 +25,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: run Mysql
-        run: systemctl start mysql
+        run: sudo systemctl start mysql
       - name: fix permissions
         run: chmod +x mvnw
       - name: Run Tests with Maven
