@@ -24,10 +24,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: debug mysql
-        run: mysql --host 127.0.0.1 --port 3306 --user=root --password=password --execute="show databases;"
       - name: run Mysql
         run: sudo systemctl start mysql
+      - name: debug mysql
+        run: mysql --host 127.0.0.1 --port 3306 --user=root --password=password --execute="show databases;"
       - name: fix permissions
         run: chmod +x mvnw
       - name: Run Tests with Maven
