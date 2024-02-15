@@ -3,10 +3,13 @@ package com.csye6225.cloud.application.controller;
 import com.csye6225.cloud.application.dto.UserResponseDTO;
 import com.csye6225.cloud.application.entity.User;
 import com.csye6225.cloud.application.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/v1")
@@ -32,7 +35,19 @@ public class UserRestController {
     }
 
     @GetMapping("/user/self")
-    public ResponseEntity<UserResponseDTO> getUser(Authentication authenication) {
+    public ResponseEntity<UserResponseDTO> getUser(Authentication authenication, HttpServletRequest request) throws IOException {
+        if(! "GET".equalsIgnoreCase(request.getMethod())) {
+            return ResponseEntity.status(405).headers(httpHeaders).build();
+        }
+        if(request.getContentType() != null && request.getContentType().toLowerCase().contains("multipart/form-data")) {
+            return ResponseEntity.status(400).headers(httpHeaders).build();
+        }
+        if(request.getInputStream().read() != -1){
+            return ResponseEntity.status(400).headers(httpHeaders).build();
+        }
+        if(! request.getParameterMap().isEmpty()) {
+            return ResponseEntity.status(400).headers(httpHeaders).build();
+        }
         User user = userService.findByUsername(authenication.getName());
         UserResponseDTO userResponseDTO = new UserResponseDTO(user);
         return ResponseEntity.ok().headers(httpHeaders).body(userResponseDTO);

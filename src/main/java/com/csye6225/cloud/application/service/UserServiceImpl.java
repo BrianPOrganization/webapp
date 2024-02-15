@@ -33,6 +33,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if(! isValidEmail(user.getUsername())) {
             throw new BadRequestException("Email provided is invalid");
         }
+        if(! notNull(user.getPassword())) {
+            throw new BadRequestException("Password cannot be empty");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setAccountCreated(LocalDateTime.now());
         user.setAccountUpdated(LocalDateTime.now());
@@ -44,6 +47,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User updateUser(String username, User user) {
         if(user.getUsername() != null) {
             throw new BadRequestException("Username should not provided for self update");
+        }
+        if(! notNull(user.getPassword())) {
+            throw new BadRequestException("Password cannot be empty");
         }
         performFieldChecks(user);
         User oldUser = findByUsername(username);
@@ -61,6 +67,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     public boolean isValidEmail(String email) {
         return EmailValidator.getInstance().isValid(email);
+    }
+
+    public boolean notNull(String value) {
+        return value != null && !value.isEmpty();
     }
 
     @Override
