@@ -14,3 +14,4 @@ OR
 2. run ./mvnw package 
 3. Step 2 is done to obtain the jar file. It will be within the target directory
 4. java -jar target/jarfilename
+5. test
