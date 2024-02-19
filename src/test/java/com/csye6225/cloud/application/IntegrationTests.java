@@ -93,7 +93,7 @@ public class IntegrationTests {
                 .get(baseUrl + "/v1/user/self").then().
                 statusCode(200)
                 .body("userName", equalTo("user1@test.com"))
-                .body("firstName", equalTo("userupdated"))
+                .body("firstName", equalTo("userupdatedzzz"))
                 .body("lastName", equalTo("2"));
     }
 
