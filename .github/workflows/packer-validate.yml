@@ -14,7 +14,7 @@ jobs:
         uses: hashicorp/setup-packer@main
         with:
           version: "latest"
-      - name: Validate Packer Template
+      - name: Init Packer Template
         run: packer init ./packer/webapp-image.pkr.hcl
       - name: Validate Packer Template
         run: packer validate ./packer/webapp-image.pkr.hcl
