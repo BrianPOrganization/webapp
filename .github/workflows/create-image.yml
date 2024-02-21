@@ -1,0 +1,54 @@
+name: Create Packer Image
+on:
+  pull_request:
+    types:
+      - closed
+  workflow_dispatch:
+
+jobs:
+  create-image:
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Use gcloud CLI
+        run:  gcloud info
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: debug mysql
+        run: mysql --host=127.0.0.1 --port=3306 --user=${{ env.MYSQL_USER }} --password=${{ env.MYSQL_ROOT_PASSWORD }} --execute="show databases;"
+      - name: fix permissions
+        run: chmod +x mvnw
+      - name: Package with Maven
+        run: ./mvnw package
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: "latest"
+      - name: validate packer
+        run: packer validate ./packer/webapp-image.pkr.hcl
+      - name: build packer
+        run: packer build ./packer/webapp-image.pkr.hcl
