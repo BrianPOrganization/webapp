@@ -49,9 +49,9 @@ source "googlecompute" "webapp-image" {
 build {
   sources = ["source.googlecompute.webapp-image"]
 
-#  provisioner "shell" {
-#    script = "scripts/update.sh"
-#  }
+  provisioner "shell" {
+    script = "scripts/update.sh"
+  }
 
   provisioner "shell" {
     script = "scripts/install_java.sh"
@@ -70,7 +70,7 @@ build {
 
   provisioner "file" {
     source      = "target/application-0.0.1-SNAPSHOT.jar"
-    destination = "/tmp/csye6225-0.0.1-SNAPSHOT.jar"
+    destination = "/tmp/application-0.0.1-SNAPSHOT.jar"
   }
 
   provisioner "file" {
