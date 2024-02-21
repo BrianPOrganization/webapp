@@ -62,6 +62,11 @@ build {
   }
 
   provisioner "file" {
+    source      = "target/application-0.0.1-SNAPSHOT.jar"
+    destination = "/tmp/application-0.0.1-SNAPSHOT.jar"
+  }
+
+  provisioner "file" {
     source      = "scripts/application.service"
     destination = "/tmp/application.service"
   }
