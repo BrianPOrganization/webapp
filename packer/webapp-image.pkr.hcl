@@ -61,4 +61,8 @@ build {
     script = "scripts/install_mysql.sh"
   }
 
+  provisioner "shell" {
+    script = "scripts/run-config.sh"
+  }
+
 }
