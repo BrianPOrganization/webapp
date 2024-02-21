@@ -48,6 +48,8 @@ jobs:
         uses: hashicorp/setup-packer@main
         with:
           version: "latest"
+      - name: Init Packer Template
+        run: packer init ./packer/webapp-image.pkr.hcl
       - name: validate packer
         run: packer validate ./packer/webapp-image.pkr.hcl
       - name: build packer
