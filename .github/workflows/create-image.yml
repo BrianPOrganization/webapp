@@ -48,9 +48,9 @@ jobs:
       - name: fix permissions
         run: chmod +x mvnw
       - name: Package with Maven
-        run: |
-          ./mvnw package
-          sudo mv target/applications-0.0.1-SNAPSHOT.jar /tmp/applications-0.0.1-SNAPSHOT.jar
+        run: ./mvnw package
+      - name: Move jar file to /tmp
+        run: sudo mv target/applications-0.0.1-SNAPSHOT.jar /tmp/applications-0.0.1-SNAPSHOT.jar
       - name: Set up Packer
         uses: hashicorp/setup-packer@main
         with:
