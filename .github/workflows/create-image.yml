@@ -49,10 +49,15 @@ jobs:
         run: chmod +x mvnw
       - name: Package with Maven
         run: ./mvnw package
+      - name: Run integration tests
+        run: ./mvnw test
       - name: Set up Packer
         uses: hashicorp/setup-packer@main
         with:
           version: "latest"
+      - name: Exit if workflow steps fail
+        run: exit 1
+        if: failure()
       - name: Init Packer Template
         run: packer init ./packer/webapp-image.pkr.hcl
       - name: validate packer
