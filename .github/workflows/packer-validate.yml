@@ -14,6 +14,15 @@ jobs:
         uses: hashicorp/setup-packer@main
         with:
           version: "latest"
+      - name: Set up Java 17 to create target directory for Packer
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: fix permissions
+        run: chmod +x mvnw
+      - name: Build with Maven to create target directory for Packer
+        run: ./mvnw clean compile
       - name: Init Packer Template
         run: packer init ./packer/webapp-image.pkr.hcl
       - name: Validate Packer Template
