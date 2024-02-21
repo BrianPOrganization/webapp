@@ -62,6 +62,23 @@ build {
   }
 
   provisioner "shell" {
+    inline = [
+      "sudo pwd",
+      "ls -la",
+    ]
+  }
+
+  provisioner "file" {
+    source      = "target/application-0.0.1-SNAPSHOT.jar"
+    destination = "/tmp/csye6225-0.0.1-SNAPSHOT.jar"
+  }
+
+  provisioner "file" {
+    source      = "scripts/application.service"
+    destination = "/tmp/application.service"
+  }
+
+  provisioner "shell" {
     script = "scripts/run-config.sh"
   }
 
