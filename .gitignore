@@ -31,3 +31,6 @@ target/
 
 # IntelliJ IDEA
 .idea/
+
+#packer
+packer/webapp-image-variable.pkr.vars.hcl
