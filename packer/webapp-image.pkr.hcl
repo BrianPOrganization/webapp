@@ -49,9 +49,9 @@ source "googlecompute" "webapp-image" {
 build {
   sources = ["source.googlecompute.webapp-image"]
 
-  provisioner "shell" {
-    script = "scripts/update.sh"
-  }
+#  provisioner "shell" {
+#    script = "scripts/update.sh"
+#  }
 
   provisioner "shell" {
     script = "scripts/install_java.sh"
