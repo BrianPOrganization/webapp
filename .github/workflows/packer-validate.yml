@@ -22,7 +22,7 @@ jobs:
       - name: fix permissions
         run: chmod +x mvnw
       - name: Build with Maven to create target directory for Packer
-        run: ./mvnw clean compile
+        run: ./mvnw package
       - name: Init Packer Template
         run: packer init ./packer/webapp-image.pkr.hcl
       - name: Validate Packer Template
