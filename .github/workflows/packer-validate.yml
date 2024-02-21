@@ -1,0 +1,20 @@
+name: Validate Packer Template
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: "latest"
+      - name: Validate Packer Template
+        run: packer init ./packer/webapp-image.pkr.hcl
+      - name: Validate Packer Template
+        run: packer validate ./packer/webapp-image.pkr.hcl
