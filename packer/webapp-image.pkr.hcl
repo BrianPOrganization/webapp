@@ -61,9 +61,4 @@ build {
     script = "scripts/install_mysql.sh"
   }
 
-  provisioner "file" {
-    source      = "target/application-0.0.1-SNAPSHOT.jar"
-    destination = "/home/centos/webapp.jar"
-  }
-
 }
