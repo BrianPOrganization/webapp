@@ -39,6 +39,8 @@ jobs:
         run: ls -l $GOOGLE_APPLICATION_CREDENTIALS
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+      - name: Add read permissions to the credentials file
+        run: chmod 644 $GOOGLE_APPLICATION_CREDENTIALS
       - name: Use gcloud CLI
         run:  gcloud info
       - name: Checkout repository
