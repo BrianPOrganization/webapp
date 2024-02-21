@@ -50,7 +50,9 @@ jobs:
       - name: Package with Maven
         run: ./mvnw package
       - name: Move jar file to /tmp
-        run: sudo mv ./target/applications-0.0.1-SNAPSHOT.jar /tmp/applications-0.0.1-SNAPSHOT.jar
+        run: |
+          pwd
+          ls -la
       - name: Set up Packer
         uses: hashicorp/setup-packer@main
         with:
