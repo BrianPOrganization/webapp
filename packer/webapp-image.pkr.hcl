@@ -1,4 +1,4 @@
-packer{
+packer {
   required_plugins {
     googlecompute = {
       source  = "github.com/hashicorp/googlecompute"
@@ -42,6 +42,8 @@ source "googlecompute" "webapp-image" {
   project_id          = "${var.project_id}"
   source_image_family = "${var.source_image_family}"
   ssh_username        = "${var.ssh_username}"
+  zone                = "${var.zone}"
+  network             = "${var.network}"
 }
 
 build {
