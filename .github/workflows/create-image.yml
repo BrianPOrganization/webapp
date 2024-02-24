@@ -65,4 +65,4 @@ jobs:
       - name: build packer
         run: |
           echo "Current directory: $(pwd)"
-          packer build ./packer/webapp-image.pkr.hcl
+          packer build -var-file="./packer/webapp-image-variable.pkr.vars.hcl" ./packer/webapp-image.pkr.hcl
