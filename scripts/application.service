@@ -1,6 +1,6 @@
 [Unit]
 Description = Csye6225 Application
-ConditionPathExists=/opt/application/application.properties
+ConditionPathExists=/opt/application/application-0.0.1-SNAPSHOT.jar
 After=network.target
 
 [Service]
