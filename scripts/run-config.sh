@@ -2,7 +2,8 @@
 echo "########## Starting the Run configuration ##########"
 echo "########## Creating a no-login-user ##########"
 sudo groupadd csye6225
-sudo useradd -s /usr/sbin/nologin -g csye6225 -m csye6225 -d /opt/application
+sudo useradd -s /usr/sbin/nologin -g csye6225 -m csye6225
+mkdir /opt/application
 sudo mv /tmp/application.service /etc/systemd/system/application.service
 echo "########## Logging configuration ##########"
 sudo touch /var/log/csye6225.log
