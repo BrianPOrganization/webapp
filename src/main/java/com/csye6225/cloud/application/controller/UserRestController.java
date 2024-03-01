@@ -31,7 +31,7 @@ public class UserRestController {
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody User payload) {
         User user = userService.createUser(payload);
         UserResponseDTO userResponseDTO = new UserResponseDTO(user);
-        return ResponseEntity.ok().headers(httpHeaders).body(userResponseDTO);
+        return ResponseEntity.status(201).headers(httpHeaders).body(userResponseDTO);
     }
 
     @GetMapping("/user/self")
@@ -54,10 +54,9 @@ public class UserRestController {
     }
 
     @PutMapping("/user/self")
-    public ResponseEntity<UserResponseDTO> updateUser(Authentication authenication, @RequestBody User payload) {
+    public ResponseEntity<Void> updateUser(Authentication authenication, @RequestBody User payload) {
         User user = userService.updateUser(authenication.getName(), payload);
-        UserResponseDTO userResponseDTO = new UserResponseDTO(user);
-        return ResponseEntity.ok().headers(httpHeaders).body(userResponseDTO);
+        return ResponseEntity.status(204).headers(httpHeaders).build();
     }
 
 }
