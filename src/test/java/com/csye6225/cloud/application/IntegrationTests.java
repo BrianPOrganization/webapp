@@ -80,10 +80,7 @@ public class IntegrationTests {
                 .when()
                 .put(baseUrl + "/v1/user/self")
                 .then().
-                statusCode(200)
-                .body("userName", equalTo("user1@test.com"))
-                .body("firstName", equalTo("userupdated"))
-                .body("lastName", equalTo("2"));
+                statusCode(204);
 
         RestAssured
                 .given()
