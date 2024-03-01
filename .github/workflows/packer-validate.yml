@@ -39,5 +39,7 @@ jobs:
         run: ./mvnw package
       - name: Init Packer Template
         run: packer init ./packer/webapp-image.pkr.hcl
+      - name: Format Packer Template
+        run: packer fmt ./packer/webapp-image.pkr.hcl
       - name: Validate Packer Template
         run: packer validate ./packer/webapp-image.pkr.hcl

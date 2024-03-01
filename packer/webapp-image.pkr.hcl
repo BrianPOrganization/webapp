@@ -57,10 +57,6 @@ build {
     script = "scripts/install_java.sh"
   }
 
-  provisioner "shell" {
-    script = "scripts/install_mysql.sh"
-  }
-
   provisioner "file" {
     source      = "target/application-0.0.1-SNAPSHOT.jar"
     destination = "/tmp/application-0.0.1-SNAPSHOT.jar"
