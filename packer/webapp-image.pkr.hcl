@@ -67,6 +67,11 @@ build {
     destination = "/tmp/application.service"
   }
 
+  provisioner "file" {
+    source      = "scripts/config.yaml"
+    destination = "/tmp/config.yaml"
+  }
+
   provisioner "shell" {
     script = "scripts/run-config.sh"
   }
