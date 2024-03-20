@@ -11,8 +11,8 @@ WorkingDirectory=/opt/application
 ExecStart=/usr/bin/java -jar /opt/application/application-0.0.1-SNAPSHOT.jar --spring.profiles.active=application --spring.config.location=file:/opt/application/application.properties
 Restart=always
 RestartSec=2
-StandardOutput=/var/log/csye6225/application.log
-StandardError=/var/log/csye6225/application.log
+StandardOutput=append:/var/log/csye6225/application.log
+StandardError=append:/var/log/csye6225/application.log
 SyslogIdentifier=csye6225
 
 [Install]
