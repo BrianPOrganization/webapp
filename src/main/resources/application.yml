@@ -1,4 +1,6 @@
 spring:
+  main:
+    banner-mode: off
   datasource:
     url: jdbc:mysql://localhost:3306/csye6225?createDatabaseIfNotExist=true
     username: root

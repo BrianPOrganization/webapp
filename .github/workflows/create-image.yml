@@ -3,10 +3,13 @@ on:
   pull_request:
     types:
       - closed
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   create-image:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     env:
       MYSQL_USER: root
