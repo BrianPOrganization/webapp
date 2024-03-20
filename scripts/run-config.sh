@@ -6,6 +6,7 @@ sudo useradd -s /usr/sbin/nologin -g csye6225 -m csye6225
 sudo mkdir /opt/application
 sudo mv /tmp/application.service /etc/systemd/system/application.service
 echo "########## Logging configuration ##########"
+sudo mkdir /var/log/csye6225
 sudo touch /var/log/csye6225/application.log
 sudo chown -R csye6225:csye6225 /var/log/csye6225/application.log
 echo "########## Moving necessary files ##########"
