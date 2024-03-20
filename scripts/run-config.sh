@@ -14,3 +14,6 @@ sudo chown -R csye6225:csye6225 /opt/application/application-0.0.1-SNAPSHOT.jar
 echo "########## Creating a service ##########"
 sudo systemctl daemon-reload
 sudo systemctl enable application
+echo "########## Adding ops agent ##########"
+curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+sudo bash add-google-cloud-ops-agent-repo.sh --also-install
