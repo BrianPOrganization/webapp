@@ -4,6 +4,8 @@ import com.csye6225.cloud.application.entity.User;
 import com.csye6225.cloud.application.exception.BadRequestException;
 import com.csye6225.cloud.application.respository.UserRepository;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
 

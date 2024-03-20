@@ -4,6 +4,8 @@ import com.csye6225.cloud.application.dto.UserResponseDTO;
 import com.csye6225.cloud.application.entity.User;
 import com.csye6225.cloud.application.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,6 +17,8 @@ import java.io.IOException;
 @RequestMapping("/v1")
 @CrossOrigin
 public class UserRestController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserRestController.class);
 
     private final UserService userService;
 
@@ -29,8 +33,10 @@ public class UserRestController {
 
     @PostMapping("/user")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody User payload) {
+        logger.info("Creating user");
         User user = userService.createUser(payload);
         UserResponseDTO userResponseDTO = new UserResponseDTO(user);
+        logger.info("User created");
         return ResponseEntity.status(201).headers(httpHeaders).body(userResponseDTO);
     }
 
