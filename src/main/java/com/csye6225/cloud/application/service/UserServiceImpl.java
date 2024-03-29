@@ -115,9 +115,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return false;
         }
         user.setEmailVerifiedAt(LocalDateTime.now(ZoneOffset.UTC));
-        if (user.getToken().equals(token) && Duration.between(createdTime, LocalDateTime.now(ZoneOffset.UTC)).toMinutes() <= 2) {
-            user.setIsVerified(true);
+        if (user.getToken().equals(token)) {
+            if(Duration.between(createdTime, LocalDateTime.now(ZoneOffset.UTC)).toMinutes() <= 2) {
+                user.setIsVerified(true);
+            } else {
+                logger.error("Token expired");
+                return false;
+            }
         } else {
+            logger.error("Invalid token");
             return false;
         }
         userRepository.save(user);
