@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,6 +28,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${gcp.email_time_duration}")
+    private int tokenExpirationTime;
 
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -116,7 +120,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         user.setEmailVerifiedAt(LocalDateTime.now(ZoneOffset.UTC));
         if (user.getToken().equals(token)) {
-            if(Duration.between(createdTime, LocalDateTime.now(ZoneOffset.UTC)).toMinutes() <= 2) {
+            if(Duration.between(createdTime, LocalDateTime.now(ZoneOffset.UTC)).toMinutes() <= tokenExpirationTime) {
                 user.setIsVerified(true);
             } else {
                 logger.error("Token expired");
