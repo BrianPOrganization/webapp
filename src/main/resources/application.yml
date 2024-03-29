@@ -18,6 +18,7 @@ server:
 gcp:
   project_id: csye6225-dev-415021
   topic_name: verify_email
+  email_time_duration: 2
 app:
   environment: dev
 
