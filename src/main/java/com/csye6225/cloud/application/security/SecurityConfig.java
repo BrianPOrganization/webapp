@@ -1,5 +1,7 @@
 package com.csye6225.cloud.application.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +15,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 public class SecurityConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -25,10 +29,11 @@ public class SecurityConfig {
                 authorizeRequests
                         .requestMatchers("/healthz").permitAll()
                         .requestMatchers("/v1/user").permitAll()
+                        .requestMatchers("verify").permitAll()
                         .anyRequest().authenticated()
         )
-                .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(withDefaults());
+        .csrf(AbstractHttpConfigurer::disable)
+        .httpBasic(withDefaults());
         return security.build();
     }
 }

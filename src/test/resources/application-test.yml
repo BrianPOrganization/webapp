@@ -21,3 +21,5 @@ logging:
               support:
                 AbstractContextLoader: WARN
                 AnnotationConfigContextLoaderUtils: WARN
+app:
+  environment: test
