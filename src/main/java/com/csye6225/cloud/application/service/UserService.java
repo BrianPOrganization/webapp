@@ -8,4 +8,6 @@ public interface UserService {
     public User createUser(User user);
     public User updateUser(String username, User user);
     public User findByUsername(String email);
+    public Boolean verifyToken(String token);
+    boolean isUserVerified(String username);
 }

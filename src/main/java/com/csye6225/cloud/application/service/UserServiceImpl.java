@@ -3,6 +3,7 @@ package com.csye6225.cloud.application.service;
 import com.csye6225.cloud.application.entity.User;
 import com.csye6225.cloud.application.exception.BadRequestException;
 import com.csye6225.cloud.application.respository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Base64;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
@@ -43,6 +48,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setAccountCreated(LocalDateTime.now());
         user.setAccountUpdated(LocalDateTime.now());
+        if(user.getIsVerified() != null && user.getIsVerified()) {
+            user.setIsVerified(user.getIsVerified());
+        } else {
+            user.setIsVerified(false);
+        }
         return userRepository.save(user);
 
     }
@@ -80,6 +90,44 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return findByUsername(username);
+    }
+
+    @Override
+    public Boolean verifyToken(String verificationToken) {
+        byte[] decodedBytes = Base64.getDecoder().decode(verificationToken);
+        String decodedToken = new String(decodedBytes);
+        String token,email = null;
+        LocalDateTime createdTime = null;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> tokenData = mapper.readValue(decodedToken, Map.class);
+            token = tokenData.get("token");
+            email = tokenData.get("email");
+            String dateTime = tokenData.get("createdTime").replace(" ", "T");
+            createdTime = LocalDateTime.parse(dateTime);
+        } catch (Exception e) {
+            logger.error("Error decoding token: (Invalid format) " + e.getMessage());
+            throw new BadRequestException("Invalid token format");
+        }
+
+        User user = userRepository.findByUsername(email);
+        if (user == null) {
+            return false;
+        }
+        user.setEmailVerifiedAt(LocalDateTime.now(ZoneOffset.UTC));
+        if (user.getToken().equals(token) && Duration.between(createdTime, LocalDateTime.now(ZoneOffset.UTC)).toMinutes() <= 2) {
+            user.setIsVerified(true);
+        } else {
+            return false;
+        }
+        userRepository.save(user);
+        return user.getIsVerified();
+    }
+
+    @Override
+    public boolean isUserVerified(String username) {
+        User user = findByUsername(username);
+        return user.getIsVerified();
     }
 
     private void performFieldChecks(User user) {

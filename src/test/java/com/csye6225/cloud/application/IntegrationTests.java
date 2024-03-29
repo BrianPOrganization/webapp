@@ -5,6 +5,8 @@ import io.restassured.RestAssured;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -19,6 +21,7 @@ import static org.hamcrest.Matchers.equalTo;
 @Transactional
 public class IntegrationTests {
 
+    private static Logger logger = LoggerFactory.getLogger(IntegrationTests.class);
 
     @Autowired
     UserService userService;
@@ -41,13 +44,16 @@ public class IntegrationTests {
 
     @Test
     void testCreateAndAccountExists() {
+        System.out.println(baseUrl);
+        logger.info("Base URL is " + baseUrl);
         RestAssured
                 .given()
                 .contentType("application/json")
                 .body("{\"username\":\"user1@test.com\"," +
                         "\"password\":\"password\"," +
                         "\"firstName\":\"user\"," +
-                        "\"lastName\":\"1\"}")
+                        "\"lastName\":\"1\"," +
+                        "\"isVerified\":true}")
                 .when()
                 .post(baseUrl + "/v1/user")
                 .then()
@@ -76,7 +82,8 @@ public class IntegrationTests {
                 .auth().basic("user1@test.com", "password")
                 .body("{\"password\":\"password1\"," +
                         "\"firstName\":\"userupdated\"," +
-                        "\"lastName\":\"2\"}")
+                        "\"lastName\":\"2\"," +
+                        "\"isVerified\":true}")
                 .when()
                 .put(baseUrl + "/v1/user/self")
                 .then().

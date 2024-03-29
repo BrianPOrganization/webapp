@@ -14,4 +14,9 @@ spring:
 server:
   servlet:
     context-path: /
+gcp:
+  project_id: csye6225-dev-415021
+  topic_name: verify_email
+app:
+  environment: dev
 

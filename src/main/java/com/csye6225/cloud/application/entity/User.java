@@ -35,6 +35,19 @@ public class User implements UserDetails {
     @Column(name = "account_updated")
     private LocalDateTime accountUpdated;
 
+    @Column(name = "is_verified", columnDefinition = "boolean default false")
+    private Boolean isVerified;
+
+    @Column(name = "email_verification_token")
+    private String token;
+
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
+
+    @Column(name = "verification_token_generated_at")
+    private LocalDateTime verificationTokenGeneratedAt;
+
+
     public UUID getId() {
         return id;
     }
@@ -116,6 +129,21 @@ public class User implements UserDetails {
         this.accountUpdated = accountUpdated;
     }
 
+    public Boolean getIsVerified() { return isVerified; }
+
+    public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
+
+    public String getToken() { return token; }
+
+    public void setToken(String token) { this.token = token; }
+
+    public LocalDateTime getEmailVerifiedAt() { return emailVerifiedAt; }
+
+    public void setEmailVerifiedAt(LocalDateTime emailVerifiedAt) { this.emailVerifiedAt = emailVerifiedAt; }
+
+    public LocalDateTime getVerificationTokenGeneratedAt() { return verificationTokenGeneratedAt; }
+
+    public void setVerificationTokenGeneratedAt(LocalDateTime verificationTokenGeneratedAt) { this.verificationTokenGeneratedAt = verificationTokenGeneratedAt; }
 
     @Override
     public String toString() {
@@ -127,6 +155,10 @@ public class User implements UserDetails {
                 ", username='" + username + '\'' +
                 ", accountCreated=" + accountCreated +
                 ", accountUpdated=" + accountUpdated +
+                ", isVerified=" + isVerified +
+                ", token='" + token + '\'' +
+                ", emailVerifiedAt=" + emailVerifiedAt +
+                ", verificationTokenGeneratedAt=" + verificationTokenGeneratedAt +
                 '}';
     }
 
