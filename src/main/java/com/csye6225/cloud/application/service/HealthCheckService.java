@@ -19,6 +19,7 @@ public class HealthCheckService {
         try {
             Connection connection = dataSource.getConnection();
             connection.createStatement().execute("Select 1");
+            dataSource.getConnection().close();
             return true;
         } catch(SQLException e) {
             return false;
