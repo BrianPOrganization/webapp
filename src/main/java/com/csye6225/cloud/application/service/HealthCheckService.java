@@ -22,6 +22,7 @@ public class HealthCheckService {
     public boolean getDBHealth() {
         try (Connection connection = dataSource.getConnection()){
             connection.createStatement().execute("Select 1");
+            dataSource.getConnection().close();
             return true;
         } catch(SQLException e) {
             logger.error("Error connecting to database: " + e.getMessage());
