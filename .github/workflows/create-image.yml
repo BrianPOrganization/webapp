@@ -92,20 +92,16 @@ jobs:
           --sort-by='~creationTimestamp' \
           --limit=1)
           echo "latest_image=$latest_image" >> $GITHUB_ENV
-
       - name: Retrieve Metadata
         id: get_metadata
         run: |
-          echo "::set-output name=secret_1::$(gcloud secrets versions access latest --secret=metadata --format='get(payload.data)' | base64 --decode)"
-
-      - name: Set METADATA as Environment Variable
-        run: echo "METADATA=${{ steps.get_metadata.outputs.secret_1 }}" >> $GITHUB_ENV
+          METADATA=$(gcloud secrets versions access latest --secret=metadata --format='get(payload.data)' | base64 --decode)
+          echo "METADATA=$METADATA" >> $GITHUB_ENV
 
       - name: Retrieve Key Ring
         id: get_key_ring
         run: |
           echo "::set-output name=secret_2::$(gcloud secrets versions access latest --secret=key_ring --format='get(payload.data)' | base64 --decode)"
-
       - name: Set KEY_RING as Environment Variable
         run: echo "KEY_RING=${{ steps.get_key_ring.outputs.secret_2 }}" >> $GITHUB_ENV
 
@@ -113,7 +109,6 @@ jobs:
         id: get_vm_key
         run: |
           echo "::set-output name=secret_3::$(gcloud secrets versions access latest --secret=vm_key --format='get(payload.data)' | base64 --decode)"
-
       - name: Set VM_KEY as Environment Variable
         run: echo "VM_KEY=${{ steps.get_vm_key.outputs.secret_3 }}" >> $GITHUB_ENV
 
@@ -122,10 +117,9 @@ jobs:
           echo "Secret 1: $METADATA"
           echo "Secret 2: $KEY_RING"
           echo "Secret 3: $VM_KEY"
-
       - name: Create new image template
         run: |
-          gcloud compute instance-templates create csye6225_template_git \
+          gcloud compute instance-templates create image-template-${{ github.run_number }} \
             --instance-template-region=us-east1 \
             --no-can-ip-forward \
             --machine-type=e2-medium \
@@ -135,41 +129,22 @@ jobs:
             --boot-disk-type=pd-balanced \
             --boot-disk-size=100GB \
             --boot-disk-kms-key=projects/csye6225-dev-415021/locations/us-east1/keyRings/$KEY_RING/cryptoKeys/$VM_KEY \
-            --network=vpc-def \
+            --network=vpc \
             --subnet=projects/csye6225-dev-415021/regions/us-east1/subnetworks/webapp-0 \
             --service-account=csye6225-dev@csye6225-dev-415021.iam.gserviceaccount.com \
             --tags=webapp-instance \
-            --metadata=startup-script=\'$METADATA\'
-
+            --metadata=startup-script=$METADATA
       - name: Update instance group
         run: |
           gcloud compute instance-groups managed rolling-action start-update instance-group-manager \
           --project=csye6225-dev-415021 \
           --region=us-east1 \
-          --version=template=projects/csye6225-dev-415021/regions/us-east1/instanceTemplates/$latest_image \
+          --version=template=projects/csye6225-dev-415021/regions/us-east1/instanceTemplates/image-template-${{ github.run_number }} \
           --max-surge=3 \
           --max-unavailable=3 \
           --quiet
       - name: Check status of Instance Group
         run: |
-          while true; do
-            STATUS=$(gcloud compute instance-groups managed describe instance-group-manager \
-              --project=csye6225-dev-415021 \
-              --region=us-east1 \
-              --format="value(status)")
-            if [[ $STATUS == "REFRESHING" ]]; then
-              echo "Instance Group is refreshing. Wait"
-              sleep 20
-            else
-              echo "Instance Group is done refreshing"
-              break
-            fi
-          done
-          if [[ $STATUS != "REFRESHED" ]]; then
-            echo "Refresh failed. Exiting"
-            exit 1
-          else
-            echo "Refresh is a success :D"
-          fi
-
-          
+          gcloud compute instance-groups managed wait-until --version-target-reached instance-group-manager \
+          --project=csye6225-dev-415021 \
+          --region=us-east1

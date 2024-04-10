@@ -31,9 +31,8 @@ jobs:
       - name: Retrieve Metadata
         id: get_metadata
         run: |
-          echo "::set-output name=secret_1::$(gcloud secrets versions access latest --secret=metadata --format='get(payload.data)' | base64 --decode)"
-      - name: Set METADATA as Environment Variable
-        run: echo "METADATA=${{ steps.get_metadata.outputs.secret_1 }}" >> $GITHUB_ENV
+          METADATA=$(gcloud secrets versions access latest --secret=metadata --format='get(payload.data)' | base64 --decode)
+          echo "METADATA=$METADATA" >> $GITHUB_ENV
 
       - name: Retrieve Key Ring
         id: get_key_ring
@@ -70,7 +69,7 @@ jobs:
             --subnet=projects/csye6225-dev-415021/regions/us-east1/subnetworks/webapp-0 \
             --service-account=csye6225-dev@csye6225-dev-415021.iam.gserviceaccount.com \
             --tags=webapp-instance \
-            --metadata=startup-script=\'$METADATA\'
+            --metadata=startup-script=$METADATA
       - name: Update instance group
         run: |
           gcloud compute instance-groups managed rolling-action start-update instance-group-manager \
