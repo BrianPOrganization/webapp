@@ -82,22 +82,6 @@ jobs:
           --quiet
       - name: Check status of Instance Group
         run: |
-          while true; do
-            STATUS=$(gcloud compute instance-groups managed describe instance-group-manager \
-              --project=csye6225-dev-415021 \
-              --region=us-east1 \
-              --format="value(status)")
-            if [[ $STATUS == "REFRESHING" ]]; then
-              echo "Instance Group is refreshing. Wait"
-              sleep 20
-            else
-              echo "Instance Group is done refreshing"
-              break
-            fi
-          done
-          if [[ $STATUS != "REFRESHED" ]]; then
-            echo "Refresh failed. Exiting"
-            exit 1
-          else
-            echo "Refresh is a success :D"
-          fi
+          gcloud compute instance-groups managed wait-until --version-target-reached instance-group-manager \
+          --project=csye6225-dev-415021 \
+          --region=us-east1
