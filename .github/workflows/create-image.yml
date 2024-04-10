@@ -126,7 +126,7 @@ jobs:
 
       - name: Create new image template
         run: |
-          gcloud compute instance-templates create image-template-$RUN_NUMBER \
+          gcloud compute instance-templates create image-template-${{ env.RUN_NUMBER }} \
             --instance-template-region=us-east1 \
             --no-can-ip-forward \
             --machine-type=e2-medium \
