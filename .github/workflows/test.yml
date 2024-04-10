@@ -76,7 +76,7 @@ jobs:
           gcloud compute instance-groups managed rolling-action start-update instance-group-manager \
           --project=csye6225-dev-415021 \
           --region=us-east1 \
-          --version=template=projects/csye6225-dev-415021/regions/us-east1/instanceTemplates/$latest_image \
+          --version=template=projects/csye6225-dev-415021/regions/us-east1/instanceTemplates/image-template-${{ github.run_number }} \
           --max-surge=3 \
           --max-unavailable=3 \
           --quiet
