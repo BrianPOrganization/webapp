@@ -74,6 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+      RUN_NUMBER: ${{ github.run_number }}
     steps:
       - id: auth
         uses: google-github-actions/auth@v2
@@ -125,7 +126,7 @@ jobs:
 
       - name: Create new image template
         run: |
-          gcloud compute instance-templates create image-template-${github.run_number} \
+          gcloud compute instance-templates create image-template-$RUN_NUMBER \
             --instance-template-region=us-east1 \
             --no-can-ip-forward \
             --machine-type=e2-medium \
