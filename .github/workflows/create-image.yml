@@ -99,7 +99,7 @@ jobs:
           echo "::set-output name=secret_1::$(gcloud secrets versions access latest --secret=metadata --format='get(payload.data)' | base64 --decode)"
 
       - name: Set METADATA as Environment Variable
-        run: echo "METADATA=${{ steps.get_secret_1.outputs.secret_1 }}" >> $GITHUB_ENV
+        run: echo "METADATA=${{ steps.get_metadata.outputs.secret_1 }}" >> $GITHUB_ENV
 
       - name: Retrieve Key Ring
         id: get_key_ring
@@ -107,7 +107,7 @@ jobs:
           echo "::set-output name=secret_2::$(gcloud secrets versions access latest --secret=key_ring --format='get(payload.data)' | base64 --decode)"
 
       - name: Set KEY_RING as Environment Variable
-        run: echo "KEY_RING=${{ steps.get_secret_2.outputs.secret_2 }}" >> $GITHUB_ENV
+        run: echo "KEY_RING=${{ steps.get_key_ring.outputs.secret_2 }}" >> $GITHUB_ENV
 
       - name: Retrieve VM Key
         id: get_vm_key
@@ -115,7 +115,7 @@ jobs:
           echo "::set-output name=secret_3::$(gcloud secrets versions access latest --secret=vm_key --format='get(payload.data)' | base64 --decode)"
 
       - name: Set VM_KEY as Environment Variable
-        run: echo "VM_KEY=${{ steps.get_secret_3.outputs.secret_3 }}" >> $GITHUB_ENV
+        run: echo "VM_KEY=${{ steps.get_vm_key.outputs.secret_3 }}" >> $GITHUB_ENV
 
       - name: Display ENV Variables
         run: |
