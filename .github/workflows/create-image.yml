@@ -124,10 +124,9 @@ jobs:
           echo "Secret 3: $VM_KEY"
 
       - name: Create new image template
-        env:
-          RUN_NUMBER: ${{ github.run_number }}
         run: |
-          gcloud compute instance-templates create image-template-${RUN_NUMBER} \
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          gcloud compute instance-templates create image-template-$TIMESTAMP \
             --instance-template-region=us-east1 \
             --no-can-ip-forward \
             --machine-type=e2-medium \
