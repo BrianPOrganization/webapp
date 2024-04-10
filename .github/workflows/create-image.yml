@@ -69,3 +69,22 @@ jobs:
         run: |
           echo "Current directory: $(pwd)"
           packer build -var-file="./packer/webapp-image-variable.pkr.vars.hcl" ./packer/webapp-image.pkr.hcl
+  rolling_update:
+    needs: create-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Use gcloud CLI
+        run: gcloud info
+      - name: Fetch details of the latest image
+        id: latest_image
+        run: |
+          latest_image=$(gcloud compute images list \
+          --filter="created by=csye6225-dev-415021" \ 
+          --sort-by="creationTimestamp DESC" \
+          --format="value(name)" \
+          --limit=1)
+          echo "The latest image is $latest_image"
