@@ -66,7 +66,7 @@ jobs:
             --boot-disk-type=pd-balanced \
             --boot-disk-size=100GB \
             --boot-disk-kms-key=projects/csye6225-dev-415021/locations/us-east1/keyRings/$KEY_RING/cryptoKeys/$VM_KEY \
-            --network=vpc-def \
+            --network=vpc \
             --subnet=projects/csye6225-dev-415021/regions/us-east1/subnetworks/webapp-0 \
             --service-account=csye6225-dev@csye6225-dev-415021.iam.gserviceaccount.com \
             --tags=webapp-instance \
