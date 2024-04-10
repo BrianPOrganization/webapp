@@ -31,8 +31,9 @@ jobs:
       - name: Retrieve Metadata
         id: get_metadata
         run: |
-          METADATA=$(gcloud secrets versions access latest --secret=metadata --format='get(payload.data)' | base64 --decode)
-          echo "METADATA=$METADATA" >> $GITHUB_ENV
+          printf "::set-output name=secret_1::%s" "$(gcloud secrets versions access latest --secret=metadata --format='get(payload.data)' | base64 --decode)"
+      - name: Set METADATA as Environment Variable
+        run: printf "METADATA=%s" "${{ steps.get_metadata.outputs.secret_1 }}" >> $GITHUB_ENV
 
       - name: Retrieve Key Ring
         id: get_key_ring
