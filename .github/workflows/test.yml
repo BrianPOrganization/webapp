@@ -1,0 +1,176 @@
+name: Create Packer Image
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  create-image:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Add read permissions to the credentials file
+        run: chmod 644 $GOOGLE_APPLICATION_CREDENTIALS
+      - name: Use gcloud CLI
+        run: gcloud info
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: print working directory
+        run: pwd
+      - name: debug mysql
+        run: mysql --host=127.0.0.1 --port=3306 --user=${{ env.MYSQL_USER }} --password=${{ env.MYSQL_ROOT_PASSWORD }} --execute="show databases;"
+      - name: fix permissions
+        run: chmod +x mvnw
+      - name: Package with Maven
+        run: ./mvnw package
+      - name: Run integration tests
+        run: ./mvnw test
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: "latest"
+      - name: Exit if workflow steps fail
+        run: exit 1
+        if: failure()
+      - name: Init Packer Template
+        run: packer init ./packer/webapp-image.pkr.hcl
+      - name: validate packer
+        run: packer validate ./packer/webapp-image.pkr.hcl
+      - name: build packer
+        run: |
+          echo "Current directory: $(pwd)"
+          packer build -var-file="./packer/webapp-image-variable.pkr.vars.hcl" ./packer/webapp-image.pkr.hcl
+  rolling_update:
+    needs: create-image
+    runs-on: ubuntu-latest
+    env:
+      GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+    steps:
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Use gcloud CLI
+        run: gcloud info
+      - name: Fetch details of the latest image
+        id: latest_image
+        run: |
+          latest_image=$(gcloud compute images list \
+          --format='value(name)' \
+          --filter='name:packer-*' \
+          --sort-by='~creationTimestamp' \
+          --limit=1)
+          echo "latest_image=$latest_image" >> $GITHUB_ENV
+
+      - name: Retrieve Metadata
+        id: get_metadata
+        run: |
+          echo "::set-output name=secret_1::$(gcloud secrets versions access latest --secret=metadata --format='get(payload.data)' | base64 --decode)"
+
+      - name: Set METADATA as Environment Variable
+        run: echo "METADATA=${{ steps.get_metadata.outputs.secret_1 }}" >> $GITHUB_ENV
+
+      - name: Retrieve Key Ring
+        id: get_key_ring
+        run: |
+          echo "::set-output name=secret_2::$(gcloud secrets versions access latest --secret=key_ring --format='get(payload.data)' | base64 --decode)"
+
+      - name: Set KEY_RING as Environment Variable
+        run: echo "KEY_RING=${{ steps.get_key_ring.outputs.secret_2 }}" >> $GITHUB_ENV
+
+      - name: Retrieve VM Key
+        id: get_vm_key
+        run: |
+          echo "::set-output name=secret_3::$(gcloud secrets versions access latest --secret=vm_key --format='get(payload.data)' | base64 --decode)"
+
+      - name: Set VM_KEY as Environment Variable
+        run: echo "VM_KEY=${{ steps.get_vm_key.outputs.secret_3 }}" >> $GITHUB_ENV
+
+      - name: Display ENV Variables
+        run: |
+          echo "Secret 1: $METADATA"
+          echo "Secret 2: $KEY_RING"
+          echo "Secret 3: $VM_KEY"
+
+      - name: Create new image template
+        run: |
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          gcloud compute instance-templates create image-template-$TIMESTAMP \
+            --instance-template-region=us-east1 \
+            --no-can-ip-forward \
+            --machine-type=e2-medium \
+            --image=$latest_image \
+            --image-project=csye6225-dev-415021 \
+            --boot-disk-auto-delete \
+            --boot-disk-type=pd-balanced \
+            --boot-disk-size=100GB \
+            --boot-disk-kms-key=projects/csye6225-dev-415021/locations/us-east1/keyRings/$KEY_RING/cryptoKeys/$VM_KEY \
+            --network=vpc-def \
+            --subnet=projects/csye6225-dev-415021/regions/us-east1/subnetworks/webapp-0 \
+            --service-account=csye6225-dev@csye6225-dev-415021.iam.gserviceaccount.com \
+            --tags=webapp-instance \
+            --metadata=startup-script=\'$METADATA\'
+
+      - name: Update instance group
+        run: |
+          gcloud compute instance-groups managed rolling-action start-update instance-group-manager \
+          --project=csye6225-dev-415021 \
+          --region=us-east1 \
+          --version=template=projects/csye6225-dev-415021/regions/us-east1/instanceTemplates/$latest_image \
+          --max-surge=3 \
+          --max-unavailable=3 \
+          --quiet
+      - name: Check status of Instance Group
+        run: |
+          while true; do
+            STATUS=$(gcloud compute instance-groups managed describe instance-group-manager \
+              --project=csye6225-dev-415021 \
+              --region=us-east1 \
+              --format="value(status)")
+            if [[ $STATUS == "REFRESHING" ]]; then
+              echo "Instance Group is refreshing. Wait"
+              sleep 20
+            else
+              echo "Instance Group is done refreshing"
+              break
+            fi
+          done
+          if [[ $STATUS != "REFRESHED" ]]; then
+            echo "Refresh failed. Exiting"
+            exit 1
+          else
+            echo "Refresh is a success :D"
+          fi
+
+          
