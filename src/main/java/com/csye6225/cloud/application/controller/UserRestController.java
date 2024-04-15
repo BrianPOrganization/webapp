@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/v5")
 @CrossOrigin
 public class UserRestController {
 
