@@ -28,7 +28,7 @@ public class SecurityConfig {
                 authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
                         .requestMatchers("/healthz").permitAll()
-                        .requestMatchers("/v1/user").permitAll()
+                        .requestMatchers("/v5/user").permitAll()
                         .requestMatchers("verify").permitAll()
                         .anyRequest().authenticated()
         )
