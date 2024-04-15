@@ -55,7 +55,7 @@ public class IntegrationTests {
                         "\"lastName\":\"1\"," +
                         "\"isVerified\":true}")
                 .when()
-                .post(baseUrl + "/v1/user")
+                .post(baseUrl + "/v5/user")
                 .then()
                 .body("userName", equalTo("user1@test.com"))
                 .body("firstName", equalTo("user"))
@@ -67,7 +67,7 @@ public class IntegrationTests {
                 .contentType("application/json")
                 .auth().basic("user1@test.com", "password")
                 .when()
-                .get(baseUrl + "/v1/user/self").then().
+                .get(baseUrl + "/v5/user/self").then().
                 statusCode(200)
                 .body("userName", equalTo("user1@test.com"))
                 .body("firstName", equalTo("user"))
@@ -85,7 +85,7 @@ public class IntegrationTests {
                         "\"lastName\":\"2\"," +
                         "\"isVerified\":true}")
                 .when()
-                .put(baseUrl + "/v1/user/self")
+                .put(baseUrl + "/v5/user/self")
                 .then().
                 statusCode(204);
 
@@ -94,7 +94,7 @@ public class IntegrationTests {
                 .contentType("application/json")
                 .auth().basic("user1@test.com", "password1")
                 .when()
-                .get(baseUrl + "/v1/user/self").then().
+                .get(baseUrl + "/v5/user/self").then().
                 statusCode(200)
                 .body("userName", equalTo("user1@test.com"))
                 .body("firstName", equalTo("userupdated"))
